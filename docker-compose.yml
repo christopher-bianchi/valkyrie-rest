@@ -1,0 +1,22 @@
+version: '2'
+services:
+  valkyrie:
+    container_name: valkyrie
+    image: christopherbianchi/simple-flask-py2:0.1
+    ports:
+      - "80:80"
+      - "5000:5000"
+    volumes:
+      - ~/Documents/Fun/Valkyrie/valkyrie-rest/source:/flask-app
+    depends_on:
+      - db
+  db:
+    container_name: db
+    image: mysql:8.0.3
+    volumes:
+      - ~/Documents/Fun/Valkyrie/valkyrie-rest/data/datastore:/var/lib/mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=dancer
+      - MYSQL_DATABASE=valkyrie
+      - MYSQL_USER=sandra
+      - MYSQL_PASSWORD=dancer
