@@ -3,10 +3,11 @@ from marshmallow import (fields,
                          pre_load,
                          post_load,
                          Schema)
-from model import (Gear,
-                   Hero,
-                   Item,
-                   Squad)
+
+from .model import (#Gear,
+                    Hero,
+                    Item,
+                    Squad)
 
 
 class SquadSchema(Schema):
@@ -19,7 +20,7 @@ class SquadSchema(Schema):
         """
         Allow hero ids to be passed in instead of a full Hero schema.
         """
-        from flask_app import db_session
+        from app.main import db_session
 
         heroes = []
         hero_ids = data.get('heroes', [])
@@ -49,7 +50,7 @@ class HeroSchema(Schema):
     id = fields.Integer(dump_only=True)
     name = fields.String(required=True)
     level = fields.Integer(required=True)
-    gear = fields.Nested('GearSchema', many=True, exclude=('heroes', ))
+    # gear = fields.Nested('GearSchema', many=True, exclude=('heroes', ))
     squads = fields.Nested('SquadSchema', many=True, only=('id', 'label'))
 
     # @pre_load
@@ -84,18 +85,18 @@ class HeroSchema(Schema):
         return Hero(**data)
 
 
-class GearSchema(Schema):
-    id = fields.Integer(dump_only=True)
-    label = fields.String(required=True)
-    heroes = fields.Nested('HeroSchema', many=True)
-    items = fields.Nested('ItemSchema', many=True, exclude=('gear', ))
+# class GearSchema(Schema):
+#     id = fields.Integer(dump_only=True)
+#     label = fields.String(required=True)
+#     heroes = fields.Nested('HeroSchema', many=True)
+#     items = fields.Nested('ItemSchema', many=True, exclude=('gear', ))
 
-    @post_load
-    def make_gear(self, data):
-        """
-        Call this method after deserializing a Gear JSON object.
-        """
-        return Gear(**data)
+#     @post_load
+#     def make_gear(self, data):
+#         """
+#         Call this method after deserializing a Gear JSON object.
+#         """
+#         return Gear(**data)
 
 
 class ItemSchema(Schema):

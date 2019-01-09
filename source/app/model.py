@@ -17,18 +17,6 @@ squad_x_hero = Table('squad_x_hero', Base.metadata,
 )
 
 
-hero_x_gear = Table('hero_x_gear', Base.metadata,
-    Column('hero_id', Integer, ForeignKey('hero.id')),
-    Column('gear_id', Integer, ForeignKey('gear.id'))
-)
-
-
-gear_x_item = Table('gear_x_item', Base.metadata,
-    Column('gear_id', Integer, ForeignKey('gear.id')),
-    Column('item_id', Integer, ForeignKey('item.id'))
-)
-
-
 class Squad(Base):
     __tablename__ = 'squad'
 
@@ -50,37 +38,23 @@ class Hero(Base):
     id = Column(Integer, primary_key=True)
     name = Column(String(128), nullable=False)
     level = Column(Integer, nullable=False)
-    gear = relationship(
-        "Gear",
-        secondary=hero_x_gear,
-        back_populates="hero"
-    )
+
     squads = relationship(
         "Squad",
         secondary=squad_x_hero,
         back_populates="heroes"
     )
+    gear_set = relationship('GearSet', back_populates='hero')
 
-    # def __init__(self, name, level):
-    #     self.name = name
-    #     self.level = level
+    # TODO: rework model and session context.
+    # def __init__(self, db_session):
+    #     self._session = db_session
 
-
-class Gear(Base):
-    __tablename__ = 'gear'
-
-    id = Column(Integer, primary_key=True)
-    label = Column(String(128), nullable=False)
-    hero = relationship(
-        "Hero",
-        secondary=hero_x_gear,
-        back_populates="gear"
-    )
-    items = relationship(
-        "Item",
-        secondary=gear_x_item,
-        back_populates="gear"
-    )
+    # def add(db_session, hero):
+    #     """
+    #     Store a new hero.
+    #     """
+    #     db_session.add(hero)
 
 
 class Item(Base):
@@ -91,8 +65,17 @@ class Item(Base):
     classification = Column(String(128), nullable=False)
     level = Column(Integer, nullable=False)
     skill_level = Column(Integer, nullable=False)
-    gear = relationship(
-        "Gear",
-        secondary=gear_x_item,
-        back_populates="items"
-    )
+
+    heroes = relationship('GearSet', back_populates='item')
+
+
+class GearSet(Base):
+    __tablename__ = 'gear_set'
+
+    id = Column(Integer, primary_key=True)
+    hero_id = Column(Integer, ForeignKey(Hero.id))
+    item_id = Column(Integer, ForeignKey(Item.id))
+    squad_id = Column(Integer, ForeignKey(Squad.id), nullable=False)
+
+    hero = relationship('Hero', back_populates='gear_set')
+    item = relationship('Item', back_populates='heroes')

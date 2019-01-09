@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding:utf-8
 from app.model import Base
-from app.flask_app import engine
+from app.main import engine
 
 
 def create_db():

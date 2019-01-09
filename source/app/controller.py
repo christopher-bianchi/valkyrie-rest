@@ -1,77 +1,128 @@
 # coding:utf-8
-from model import (Gear,
-                   Hero,
-                   Item,
-                   Squad)
+from .model import (#Gear,
+                    Hero,
+                    Item,
+                    Squad,
+                    GearSet)
 
 
-def get_squads(db_sess):
-    """
-    Get all stored squads.
-    """
-    squads = db_sess.query(Squad).all()
-    return squads
-
-
-def add_squad(db_sess, squad):
-    """
-    Store a new squad.
-    """
-    # import pdb; pdb.set_trace()
-    db_sess.add(squad)
-    db_sess.commit()
-    db_sess.close()
-
-
-def get_heroes(db_sess):
-    """
-    Get all stored heroes.
-    """
-    heroes = db_sess.query(Hero).all()
-    return heroes
-
-
-def add_hero(db_sess, hero):
+def add_hero(db_session, hero):
     """
     Store a new hero.
     """
-    # import pdb; pdb.set_trace()
-    db_sess.add(hero)
-    db_sess.commit()
-    db_sess.close()
+    db_session.add(hero)
 
 
-def get_items(db_sess):
+def add_heroes_to_squad(db_session, squad, hero_ids):
     """
-    Get all stored items.
+    Assign heroes to an existing squad.
     """
-    items = db_sess.query(Item).all()
-    return items
+    if hero_ids:
+        for hid in hero_ids:
+            hero = get_hero_by_id(db_session, hid)
+            squad.heroes.append(hero)
+        db_session.add(squad)
 
 
-def add_item(db_sess, item):
+def add_item(db_session, item):
     """
     Store a new item.
     """
-    # import pdb; pdb.set_trace()
-    db_sess.add(item)
-    db_sess.commit()
-    db_sess.close()
+    db_session.add(item)
 
 
-def get_gear(db_sess):
+def add_items_to_hero(db_session, squad, hero, item_ids):
     """
-    Get all stored gear.
-    """
-    gear = db_sess.query(Gear).all()
-    return gear
-
-
-def add_gear(db_sess, gear):
-    """
-    Store new gear.
+    Assign items to a hero in an existing squad.
     """
     # import pdb; pdb.set_trace()
-    db_sess.add(gear)
-    db_sess.commit()
-    db_sess.close()
+    if item_ids:
+        for iid in item_ids:
+            item = get_item_by_id(db_session, iid)
+            squad_hero_item = GearSet(squad_id=squad.id)
+            squad_hero_item.item = item
+            hero.items.append(squad_hero_item)
+        # get item
+        # make GearSet
+        # assign item to GearSet
+        # add GearSet to hero.items
+        db_session.add(hero)
+
+
+def add_squad(db_session, squad):
+    """
+    Store a new squad.
+    """
+    db_session.add(squad)
+
+
+def get_heroes(db_session):
+    """
+    Get all stored heroes.
+    """
+    heroes = db_session.query(Hero).all()
+    return heroes
+
+
+def get_hero_by_id(db_session, hid):
+    """
+    Get an existing hero by it's ID.
+    """
+    hero = db_session.query(Hero).filter_by(id=hid).one()
+    return hero
+
+
+def get_hero_by_name(db_session, name):
+    """
+    Get an existing hero by it's name.
+    """
+    hero = db_session.query(Hero).filter_by(name=name).one()
+    return hero
+
+
+def get_items(db_session):
+    """
+    Get all stored items.
+    """
+    items = db_session.query(Item).all()
+    return items
+
+
+def get_item_by_id(db_session, iid):
+    """
+    Get an existing item by it's ID.
+    """
+    item = db_session.query(Item).filter_by(id=iid).one()
+    return item
+
+
+def get_item_by_name(db_session, name):
+    """
+    Get an existing item by it's name.
+    """
+    item = db_session.query(Item).filter_by(name=name).one()
+    return item
+
+
+def get_squads(db_session):
+    """
+    Get all stored squads.
+    """
+    squads = db_session.query(Squad).all()
+    return squads
+
+
+def get_squad_by_id(db_session, sid):
+    """
+    Get an existing squad by it's ID.
+    """
+    squad = db_session.query(Squad).filter_by(id=sid).one()
+    return squad
+
+
+def get_squad_by_name(db_session, name):
+    """
+    Get an existing squad by it's name.
+    """
+    squad = db_session.query(Squad).filter_by(name=name).one()
+    return squad
